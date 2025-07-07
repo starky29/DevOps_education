@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netology-deployment
+  labels:
+    app: nginx_multy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx_multy
+  template:
+    metadata:
+      labels:
+        app: nginx_multy
+    spec:
+      containers:
+      - name: multytools
+        image: wbitt/network-multitool
+        envFrom:
+        - configMapRef:
+            name: env-config
+        ports:
+          - name: http-port
+            containerPort: 8080
+          - name: https-ports
+            containerPort: 11443
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: env-config
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: env-config
+        configMap:
+          name: env-config
